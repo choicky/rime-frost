@@ -1,0 +1,17 @@
+# radical_pinyin.custom.yaml
+# 仅覆盖 speller 里面的 algebra
+
+patch:
+  # 修改为双拼的拼写派生规则，因为不在同一个文件了，前面要加上文件名
+  speller/algebra:
+    alphabet: "abcdefghijklmnopqrstuvwxyz;"
+    delimiter: " '"
+    algebra:
+      # 根据当前所用拼音方案选择 __include 的值
+      # __include: algebra_pinyin           # 全拼
+      __include: algebra_double_pinyin  # 自然码双拼
+      # __include: algebra_flypy          # 小鹤双拼
+      # __include: algebra_mspy           # 微软双拼
+      # __include: algebra_sogou          # 搜狗双拼
+      # __include: algebra_abc            # 智能ABC双拼
+      # __include: algebra_ziguang        # 紫光双拼
