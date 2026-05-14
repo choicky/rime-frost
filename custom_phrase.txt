@@ -8,3 +8,23 @@
 # 以 Tab 分割：词汇<Tab>编码<Tab>权重
 
 啊	a	3
+
+Mac     mac     2
+macOS   mac     1
+iPhone  iph
+
+zhoucaiqi       zho     2
+zhoucaiqi@gmail.com     zho     1
+
+Gemini  gem
+
+@gmail.com      @       5
+@qq.com @       4
+@163.com        @       1
+@tahota.com     @       3
+@ipinfo.com     @       2
+
+IH  ih  1
+IF  if  1
+IC  ic  1
+IM  im  1
