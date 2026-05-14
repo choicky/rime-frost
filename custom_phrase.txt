@@ -9,22 +9,22 @@
 
 啊	a	3
 
-Mac     mac     2
-macOS   mac     1
-iPhone  iph
+Mac	mac	2
+macOS	mac	1
+iPhone	iph
 
-zhoucaiqi       zho     2
-zhoucaiqi@gmail.com     zho     1
+zhoucaiqi		zho	2
+zhoucaiqi@gmail.com	zho	1
 
-Gemini  gem
+Gemini	gem
 
-@gmail.com      @       5
-@qq.com @       4
-@163.com        @       1
-@tahota.com     @       3
-@ipinfo.com     @       2
+@gmail.com	 @		5
+@qq.com @		4
+@163.com		@		1
+@tahota.com	@		3
+@ipinfo.com	@		2
 
-IH  ih  1
-IF  if  1
-IC  ic  1
-IM  im  1
+IH	ih	1
+IF	if	1
+IC	ic	1
+IM	im	1
