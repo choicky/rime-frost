@@ -1,0 +1,7 @@
+# Patch to rime_frost
+# encoding: utf-8
+
+patch:
+  # 启用万象语法模型
+  # 格式为 [文件名]:/[文件内部的键名]
+  __include: wanxiang_octagram:/octagram
