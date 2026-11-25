@@ -4,8 +4,8 @@
 
 - Work in `choicky/rime-frost`. Create topic branches from `origin/custom` and open PRs with `gh pr create --repo choicky/rime-frost --base custom --head <branch>`. Check the repository and base before submitting. Open upstream PRs only when explicitly asked.
 - `master` mirrors `gaboolic/rime-frost:master`. Only upstream fast-forwards belong on it. Integrate upstream into `custom` with a reviewed merge commit to preserve ancestry.
-- Prefer Rime `*.custom.yaml` patches for fork settings. Keep changes to inherited schemas, dictionaries, and Lua out of unrelated PRs.
-- Use [OPERATIONS.md](OPERATIONS.md) for synchronization, validation, and conflict recovery.
+- Put fork schema selection in the tracked `default.custom.yaml` patch. Use local `*.custom.yaml` files for personal settings. Keep private phrases, user dictionaries, and user data out of Git. Review the packaged ZIP whenever runtime paths change.
+- Use [OPERATIONS.md](OPERATIONS.md) for synchronization, validation, and release operations.
 
 ## Upstream dictionary maintenance
 

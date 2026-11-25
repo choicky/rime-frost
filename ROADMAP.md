@@ -1,4 +1,4 @@
 # Roadmap
 
-- Enable daily upstream updates and verify the first scheduled run on GitHub.
-- Keep fork-specific input settings in small `*.custom.yaml` patches as needs arise.
+- Verify the first automatic publication from `custom` and the permanent ZIP download.
+- Smoke-test the packaged defaults after upstream changes to Rime dependencies.
