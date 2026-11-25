@@ -1,0 +1,62 @@
+name: Publish custom release
+
+on:
+  push:
+    branches: [custom]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: custom-release-${{ github.ref }}
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  validate:
+    if: github.repository == 'choicky/rime-frost' && github.ref == 'refs/heads/custom'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/validate.yml
+    with:
+      upload_release: true
+
+  publish:
+    needs: validate
+    if: github.repository == 'choicky/rime-frost' && github.ref == 'refs/heads/custom'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v6
+        with:
+          name: frost-release
+      - name: Publish verified assets as Latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          current_head() {
+            gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/custom" --jq '.object.sha'
+          }
+          head=$(current_head)
+          if [[ "$head" != "$GITHUB_SHA" ]]; then
+            echo "Skipping release for superseded commit $GITHUB_SHA."
+            exit 0
+          fi
+
+          sha256sum --check SHA256SUMS
+          tag="custom-${GITHUB_SHA:0:12}-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          gh release create "$tag" rime-frost-schemas.zip SHA256SUMS \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "Rime Frost Custom $tag" --notes "Source commit: \`$GITHUB_SHA\`." \
+            --draft --prerelease=false --latest=false
+
+          head=$(current_head)
+          if [[ "$head" != "$GITHUB_SHA" ]]; then
+            echo "Leaving unpublished draft $tag because custom advanced during upload."
+            exit 0
+          fi
+          gh release edit "$tag" --repo "$GITHUB_REPOSITORY" \
+            --draft=false --prerelease=false --latest

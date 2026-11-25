@@ -1,0 +1,4 @@
+patch:
+  schema_list:
+    - schema: rime_frost_double_pinyin
+    - schema: rime_frost

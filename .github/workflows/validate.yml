@@ -7,10 +7,13 @@ on:
     inputs:
       head:
         type: string
-        required: true
+        default: ''
       base:
         type: string
-        required: true
+        default: ''
+      upload_release:
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -70,3 +73,18 @@ jobs:
         run: |
           bash others/test/frost_14key_smoke.sh
           bash others/test/frost_stroke_smoke.sh
+      - name: Package and test a clean installation
+        run: |
+          release_dir="$RUNNER_TEMP/frost-release"
+          mkdir "$release_dir"
+          python3 .github/scripts/package-custom.py "$release_dir"
+          bash others/test/frost_custom_smoke.sh "$release_dir/rime-frost-schemas.zip"
+          cd "$release_dir"
+          sha256sum rime-frost-schemas.zip > SHA256SUMS
+      - uses: actions/upload-artifact@v5
+        if: inputs.upload_release
+        with:
+          name: frost-release
+          path: ${{ runner.temp }}/frost-release/
+          if-no-files-found: error
+          compression-level: 0
