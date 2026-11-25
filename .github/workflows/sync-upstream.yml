@@ -1,0 +1,46 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'choicky/rime-frost' && github.ref == 'refs/heads/custom'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      pr: ${{ steps.sync.outputs.pr }}
+      head: ${{ steps.sync.outputs.head }}
+      base: ${{ steps.sync.outputs.base }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Fast-forward master and find or open the integration PR
+        id: sync
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git remote add upstream https://github.com/gaboolic/rime-frost.git
+          bash .github/scripts/sync-upstream.sh
+
+  validate:
+    needs: sync
+    if: needs.sync.outputs.pr != ''
+    permissions:
+      contents: read
+    uses: ./.github/workflows/validate.yml
+    with:
+      head: ${{ needs.sync.outputs.head }}
+      base: ${{ needs.sync.outputs.base }}

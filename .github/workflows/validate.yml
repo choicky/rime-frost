@@ -1,0 +1,72 @@
+name: Validate PR
+
+on:
+  pull_request:
+    branches: [custom]
+  workflow_call:
+    inputs:
+      head:
+        type: string
+        required: true
+      base:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.base || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check integration merge
+        if: inputs.head != ''
+        env:
+          HEAD_SHA: ${{ inputs.head }}
+        run: |
+          if ! git -c user.name=CI -c user.email=ci@example.invalid merge --no-commit --no-ff "$HEAD_SHA"; then
+            echo '::error::Upstream integration failed. Inspect the merge output and resolve conflicts on a branch based on custom.'
+            exit 1
+          fi
+      - name: Install validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ librime-dev librime-plugin-lua lua5.4 python3-yaml shellcheck
+          curl --fail --silent --show-error --location \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz \
+            | tar -xz -C "$RUNNER_TEMP" actionlint
+      - name: Check workflows, YAML and Lua
+        run: |
+          "$RUNNER_TEMP/actionlint"
+          shellcheck .github/scripts/sync-upstream.sh
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess
+          import yaml
+
+          for name in subprocess.check_output(["git", "ls-files", "-z", "*.yaml", "*.yml"]).decode().split("\0"):
+              if not name:
+                  continue
+              with Path(name).open(encoding="utf-8-sig") as source:
+                  # Rime stores tab-separated dictionary entries after the YAML header.
+                  if name.endswith(".dict.yaml"):
+                      header = []
+                      for line in source:
+                          header.append(line)
+                          if line.rstrip() == "...":
+                              break
+                      list(yaml.compose_all("".join(header), Loader=yaml.CSafeLoader))
+                  else:
+                      list(yaml.compose_all(source, Loader=yaml.CSafeLoader))
+          PY
+          while IFS= read -r -d '' source; do luac5.4 -p "$source"; done < <(find lua -type f -name '*.lua' -print0)
+      - name: Deploy and exercise Rime schemas
+        run: |
+          bash others/test/frost_14key_smoke.sh
+          bash others/test/frost_stroke_smoke.sh
