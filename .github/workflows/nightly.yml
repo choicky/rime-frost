@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: nightly-release
@@ -15,6 +15,9 @@ concurrency:
 
 jobs:
   build-nightly:
+    if: github.repository == 'gaboolic/rime-frost'
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
 
     steps:
